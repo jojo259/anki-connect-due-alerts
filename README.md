@@ -15,5 +15,6 @@ uses Python and interfaces with Anki using Anki-Connect
   - sendAlertMinIntervalMinutes: the minimum interval (minutes) between each time the program will alert if you have cards due (should always be equal to or greater than loop interval minutes)
   - userDiscordId: your Discord ID which the program will tag in the Discord alert
   - tagAtDueCountAbove: when the total number of due cards is greater than this, the program will alert you
+  - monitorDeckNames: comma-separated (no space) list of deck names which this program will alert for; leave blank for all decks
 - install required Python modules with `pip install -r requirements.txt`
 - run `main.py` with Python

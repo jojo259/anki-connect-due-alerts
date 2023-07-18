@@ -10,6 +10,12 @@ loopIntervalMinutes = int(os.environ['loopIntervalMinutes'])
 discordWebhookUrl = os.environ['discordWebhookUrl']
 userDiscordId = os.environ['userDiscordId']
 tagAtDueCountAbove = int(os.environ['tagAtDueCountAbove'])
+monitorDeckNames = os.environ['monitorDeckNames']
+
+if monitorDeckNames == None or monitorDeckNames == '':
+	monitorDeckNames = []
+else:
+	monitorDeckNames = monitorDeckNames.split(',')
 
 serverUrl = 'http://localhost:8765'
 lastSentAlert = 0
@@ -54,14 +60,18 @@ def mainLoop():
 	dueData = getDueData()
 	allDecksDueCount = 0
 	for deckId, data in dueData.items():
+		deckName = data['name']
+		if len(monitorDeckNames) > 0 and deckName not in monitorDeckNames:
+			print(f'deck {deckName} is not being monitored')
+			continue
 		dueNew = data['new_count']
 		dueLearning = data['learn_count']
 		dueReview = data['review_count']
 		dueTotal = dueNew + dueLearning + dueReview
 		if dueTotal > 0:
-			print(f'deck has {dueTotal} due')
+			print(f'deck {deckName} has {dueTotal} due')
 			allDecksDueCount += dueTotal
-			extraLog = data['name'] + '\n'
+			extraLog = deckName + '\n'
 			dueTypes = {'NEW': dueNew, 'LEARNING': dueLearning, 'REVIEW': dueReview}
 			for dueTypeName, dueCount in dueTypes.items():
 				if dueCount > 0:
