@@ -5,12 +5,14 @@ import time
 import dotenv
 dotenv.load_dotenv()
 
+sendAlertMinIntervalMinutes = int(os.environ['sendAlertMinIntervalMinutes'])
 loopIntervalMinutes = int(os.environ['loopIntervalMinutes'])
 discordWebhookUrl = os.environ['discordWebhookUrl']
 userDiscordId = os.environ['userDiscordId']
 tagAtDueCountAbove = int(os.environ['tagAtDueCountAbove'])
 
 serverUrl = 'http://localhost:8765'
+lastSentAlert = 0
 
 def getDeckNames():
 	data = {
@@ -43,6 +45,11 @@ def sendDiscord(toSend):
 
 def mainLoop():
 	print('running main loop')
+	global lastSentAlert
+	if time.time() - lastSentAlert < sendAlertMinIntervalMinutes * 60:
+		print('sent alert too recently')
+		return
+	lastSentAlert = time.time()
 	logStr = ''
 	dueData = getDueData()
 	allDecksDueCount = 0
