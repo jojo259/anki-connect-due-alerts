@@ -57,7 +57,6 @@ def mainLoop():
 	if time.time() - lastSentAlert < sendAlertMinIntervalMinutes * 60:
 		print('sent alert too recently')
 		return
-	lastSentAlert = time.time()
 	logStr = ''
 	dueData = getDueData()
 	allDecksDueCount = 0
@@ -85,6 +84,7 @@ def mainLoop():
 			sendDiscord(f'```TOTAL DUE: {allDecksDueCount}\n{logStr}```<@{userDiscordId}>')
 		except requests.exceptions.RequestException as e:
 			triggerIfttt()
+	lastSentAlert = time.time()
 
 def runLoop():
 	print('starting main loop forever')
