@@ -8,6 +8,7 @@ dotenv.load_dotenv()
 sendAlertMinIntervalMinutes = int(os.environ['sendAlertMinIntervalMinutes'])
 loopIntervalMinutes = int(os.environ['loopIntervalMinutes'])
 discordWebhookUrl = os.environ['discordWebhookUrl']
+iftttWebhookUrl = os.environ['iftttWebhookUrl']
 userDiscordId = os.environ['userDiscordId']
 tagAtDueCountAbove = int(os.environ['tagAtDueCountAbove'])
 monitorDeckNames = os.environ['monitorDeckNames']
@@ -44,10 +45,11 @@ def sendDiscord(toSend):
 	data = {}
 	data['username'] = 'anki'
 	data['content'] = toSend
-	try:
-		requests.post(discordWebhookUrl, json = data, headers = {'Content-Type': 'application/json'}, timeout = 30)
-	except requests.exceptions.RequestException as e:
-		print(f'send discord error: {e}')
+	requests.post(discordWebhookUrl, json = data, headers = {'Content-Type': 'application/json'}, timeout = 30)
+
+def triggerIfttt():
+	print('triggering ifttt')
+	requests.post(iftttWebhookUrl, timeout = 30)
 
 def mainLoop():
 	print('running main loop')
@@ -79,7 +81,10 @@ def mainLoop():
 			logStr += extraLog
 	print(f'total due count is {allDecksDueCount}')
 	if allDecksDueCount > tagAtDueCountAbove:
-		sendDiscord(f'```TOTAL DUE: {allDecksDueCount}\n{logStr}```<@{userDiscordId}>')
+		try:
+			sendDiscord(f'```TOTAL DUE: {allDecksDueCount}\n{logStr}```<@{userDiscordId}>')
+		except requests.exceptions.RequestException as e:
+			triggerIfttt()
 
 def runLoop():
 	print('starting main loop forever')
